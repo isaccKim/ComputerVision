@@ -5,7 +5,7 @@ using namespace cv;
 using namespace std;
 
 int main()
-{
+{ 
     Mat image = imread("lena.png", 0);
     Mat negative_img = image.clone();
 
