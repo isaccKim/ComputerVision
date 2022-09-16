@@ -16,7 +16,7 @@ int main()
     imshow("moon", image_m);
     GaussianBlur(image_m, GaussianImg, Size(3, 3), 0, 0, BORDER_DEFAULT);
     image_result1 = image_m-GaussianImg; //gmask
-    add(image_m(rect_1),image_result1(rect_1)*20,image_result2(rect_1));
+    add(image_m(rect_1),image_result1(rect_1)*6,image_result2(rect_1));
 
    imshow("moon_filtered", image_result2);
     
