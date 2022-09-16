@@ -18,13 +18,13 @@ int main()
         waitKey(0);
     }
     fps = cap.get(CAP_PROP_FPS);
-    total = cap.get(CAP_PROP_FRAME_COUNT)
+    total = cap.get(CAP_PROP_FRAME_COUNT);
     delay = 1000 / fps;
     while (1)
     {
         cap >> frame;
         cout << "frames: " << fps*cap.get(CAP_PROP_POS_MSEC)/1000 << " / " << total << endl;
-        if (cap.get(CAP_PROP_POS_MSEC) >=3000) //
+        if (cap.get(CAP_PROP_POS_MSEC) >=3000)
         {
             break;
         }
