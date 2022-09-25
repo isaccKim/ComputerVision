@@ -34,10 +34,10 @@ Mat putTextValue(Mat src)
     const float *histRange = {range};
     histSize = 8;
     calcHist(&src, 1, 0, Mat(), hist, 1, &histSize, &histRange);
-        
+    normalize(hist, hist, 0, (float)src.rows, NORM_MINMAX, -1, Mat());    
     for (i = 0; i < histSize; i++){
         float pixel = src.rows * src.cols;
-        putText(src,format("bin %d : %f",i+1,hist.at<float>(i)/pixel),Point(40,40+i*40),FONT_HERSHEY_COMPLEX,0.5,Scalar(0,20,2), 1);
+        putText(src,format("bin %d : %f",i+1,hist.at<float>(i)/src.cols),Point(40,40+i*40),FONT_HERSHEY_COMPLEX,0.5,Scalar(0,20,2), 1);
     }
     return histImage;
 }
