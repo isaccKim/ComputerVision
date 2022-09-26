@@ -10,7 +10,6 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
     float rho = 0, theta = 0, a, b, x0, y0;
     Point p1, p2;
     HoughLines(left_src, lines, 1, CV_PI / 180, 80, 0, 0, 30 * CV_PI / 180, 60 * CV_PI / 180);
-    // HoughLines(left_src, lines, 1, CV_PI / 180, 150, 0, 0, 30 * CV_PI / 180, 60 * CV_PI / 180);
     for (int i = 0; i < lines.size(); i++)
     {
         rho += lines[i][0];
@@ -25,7 +24,9 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
     y0 = b * rho;
     p1 = Point(cvRound(x0 + 1000 * (-b)) + 200, cvRound(y0 + 1000 * a) + 400);
     p2 = Point(cvRound(x0 - 1000 * (-b)) + 200, cvRound(y0 - 1000 * a) + 400);
-    line(result, p1, p2, Scalar(0, 0, 255), 3, 0);
+    if(p1 != Point(200,400) && p2 != Point(200,400)){
+        line(result, p1, p2, Scalar(0, 0, 255), 3, 0);
+    }
 
     HoughLines(right_src, lines, 1, CV_PI / 180, 80, 0, 0, 120 * CV_PI / 180, 150 * CV_PI / 180);
     rho = 0;
@@ -44,7 +45,9 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
     y0 = b * rho;
     p1 = Point(cvRound(x0 + 1000 * (-b)) + 600, cvRound(y0 + 1000 * a) + 400);
     p2 = Point(cvRound(x0 - 1000 * (-b)) + 600, cvRound(y0 - 1000 * a) + 400);
-    line(result, p1, p2, Scalar(0, 0, 255), 3, 0);
+    if(p1 != Point(600,400) && p2 != Point(600,400)){
+        line(result, p1, p2, Scalar(0, 0, 255), 3, 0);
+    }
     return result;
 }
 
@@ -78,7 +81,7 @@ int main()
         cvtColor(frame, gray, CV_BGR2GRAY);
 
         blur(gray, blurIm, Size(5, 5));
-        Canny(blurIm, canny, 100, 200, 3);
+        Canny(blurIm, canny, 100, 160, 3);
 
         canny_left = canny(Range(400, 600), Range(200, 600));
         canny_right = canny(Range(400, 600), Range(600, 1000));
