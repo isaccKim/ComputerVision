@@ -9,7 +9,7 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
     vector<Vec2f> lines;
     float rho = 0, theta = 0, a, b, x0, y0;
     Point p1, p2;
-    HoughLines(left_src, lines, 1, CV_PI / 180, 80, 0, 0, 30 * CV_PI / 180, 60 * CV_PI / 180);
+    HoughLines(left_src, lines, 1, CV_PI / 180, 75, 0, 0, 30 * CV_PI / 180, 60 * CV_PI / 180);
     for (int i = 0; i < lines.size(); i++)
     {
         rho += lines[i][0];
@@ -28,7 +28,7 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
         line(result, p1, p2, Scalar(0, 0, 255), 3, 0);
     }
 
-    HoughLines(right_src, lines, 1, CV_PI / 180, 80, 0, 0, 120 * CV_PI / 180, 150 * CV_PI / 180);
+    HoughLines(right_src, lines, 1, CV_PI / 180, 75, 0, 0, 120 * CV_PI / 180, 150 * CV_PI / 180);
     rho = 0;
     theta = 0;
     for (int i = 0; i < lines.size(); i++)
@@ -81,11 +81,11 @@ int main()
         cvtColor(frame, gray, CV_BGR2GRAY);
 
         blur(gray, blurIm, Size(5, 5));
-        Canny(blurIm, canny, 100, 160, 3);
+        // Canny(blurIm, canny, 100, 160, 3);
+        Canny(blurIm, canny, 10, 60, 3);
 
         canny_left = canny(Range(400, 600), Range(200, 600));
         canny_right = canny(Range(400, 600), Range(600, 1000));
-        // canny_right = canny;
         frame = drawLines(canny_left, canny_right, frame);
 
         imshow("video", frame);
