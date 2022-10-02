@@ -9,24 +9,26 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
     vector<Vec2f> lines;
     float rho = 0, theta = 0, a, b, x0, y0;
     Point p1, p2;
-    HoughLines(left_src, lines, 1, CV_PI / 180, 100, 0, 0, 30 * CV_PI / 180, 60 * CV_PI / 180);
+    HoughLines(left_src, lines, 1, CV_PI / 180, 100, 0, 0, 30 * CV_PI / 180, 60 * CV_PI / 180); 
+    // HoughLines : 일반 평면에 있던 점들을 다른 좌표평면에 직선으로 나타내고 그값을 lines애 저장
     for (int i = 0; i < lines.size(); i++)
     {
         rho += lines[i][0];
         theta += lines[i][1];
     }
-    rho /= lines.size();
+    rho /= lines.size();  
     theta /= lines.size();
 
     a = cos(theta);
     b = sin(theta);
-    x0 = a * rho;
+    x0 = a * rho; // 평면 옮기는 작업
     y0 = b * rho;
     p1 = Point(cvRound(x0 + 1000 * (-b)) + 200, cvRound(y0 + 1000 * a) + 400);
     p2 = Point(cvRound(x0 - 1000 * (-b)) + 200, cvRound(y0 - 1000 * a) + 400);
+    // ROI를 하며 바뀐 중심측
     if(p1 != Point(200,400) && p2 != Point(200,400)){
-        line(result, p1, p2, Scalar(0, 0, 255), 3, 0);
-    }
+        line(result, p1, p2, Scalar(0, 0, 255), 4, 0); // x,y,좌표가 없을 경우 200,400좌표에 점이 생기는 것을 막기위한 if문
+    } 
 
     HoughLines(right_src, lines, 1, CV_PI / 180, 100, 0, 0, 120 * CV_PI / 180, 150 * CV_PI / 180);
     rho = 0;
@@ -36,7 +38,7 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
         rho += lines[i][0];
         theta += lines[i][1];
     }
-    rho /= lines.size();
+    rho /= lines.size(); 
     theta /= lines.size();
 
     a = cos(theta);
@@ -46,7 +48,7 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
     p1 = Point(cvRound(x0 + 1000 * (-b)) + 600, cvRound(y0 + 1000 * a) + 400);
     p2 = Point(cvRound(x0 - 1000 * (-b)) + 600, cvRound(y0 - 1000 * a) + 400);
     if(p1 != Point(600,400) && p2 != Point(600,400)){
-        line(result, p1, p2, Scalar(0, 0, 255), 3, 0);
+        line(result, p1, p2, Scalar(0, 0, 255), 4, 0);
     }
     return result;
 }
@@ -56,10 +58,7 @@ int main()
     Mat frame, canny_left, canny_right, gray, blurIm, canny;
     int fps;
     int delay;
-    int total;
 
-    Mat result;
-    Point p1, p2;
 
     VideoCapture cap; // 카메라 또는 비디오 파일로 부터 프레임을 읽는데 필요한 정보
 
@@ -74,7 +73,6 @@ int main()
     while (1)
     {
         cap >> frame;
-        cout << "frames: " << fps*cap.get(CAP_PROP_POS_MSEC)/1000 << " / " << total << endl;
         if (cap.get(CAP_PROP_POS_MSEC) >= 20000)
         {
             break;
@@ -93,7 +91,6 @@ int main()
         imshow("Left Canny", canny_left);
         moveWindow("Right Canny", 600, 0);
         imshow("Right Canny", canny_right);
-        // imshow("trnas", result);
         waitKey(delay);
     }
 }
