@@ -29,9 +29,12 @@ int main()
     imshow("temp",a_image);    
     threshold(f_image,f_dst,160, 255, CV_THRESH_BINARY);
     
-    // inRange(a_image,Scalar(130),Scalar(225),a_dst);
-
-    adaptiveThreshold(a1_image,a1_dst, 255, ADAPTIVE_THRESH_GAUSSIAN_C,THRESH_BINARY,7,8);
+    //GaussianBlur(a_image, a_image, Size(3,3), 0);
+    //inRange(a_image,Scalar(160),Scalar(225),a_dst);
+    
+    adaptiveThreshold(a_image,a_dst, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C,THRESH_BINARY,7,8); //줄무늬 격자가 있는 이미지 => 가우시안블러처리
+    
+    adaptiveThreshold(a1_image,a1_dst, 255, ADAPTIVE_THRESH_GAUSSIAN_C,THRESH_BINARY,7,8); //줄무늬 격자가 있는 이미지 => 가우시안블러처리
     
 
     imshow("finger_print.png",f_dst);
