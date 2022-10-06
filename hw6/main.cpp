@@ -29,9 +29,9 @@ int main()
     threshold(f_image,f_dst,160, 255, CV_THRESH_BINARY);
     //inRange(a_image,Scalar(160),Scalar(225),a_dst);
     
-    adaptiveThreshold(a_image,a_dst, 255, CV_ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,7,8); //줄무늬 격자가 있는 이미지 => 가우시안블러처리
+    adaptiveThreshold(a_image,a_dst, 255, CV_ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,85, 15); //줄무늬 격자가 있는 이미지 => 가우시안블러처리
     
-    adaptiveThreshold(a1_image,a1_dst, 255, ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,7,8); //
+    adaptiveThreshold(a1_image,a1_dst, 255, ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,3,5); //
     
 
     imshow("finger_print.png",f_dst);
