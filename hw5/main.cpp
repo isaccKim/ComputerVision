@@ -8,7 +8,7 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
 {
     vector<Vec2f> lines;
     float rho = 0, theta = 0, a, b, x0, y0;
-    Point p1, p2;
+    Point p1, p2; 
     HoughLines(left_src, lines, 1, CV_PI / 180, 100, 0, 0, 30 * CV_PI / 180, 60 * CV_PI / 180); 
     // HoughLines : 일반 평면에 있던 점들을 다른 좌표평면에 직선으로 나타내고 그값을 lines애 저장
     for (int i = 0; i < lines.size(); i++)

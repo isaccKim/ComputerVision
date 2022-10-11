@@ -17,8 +17,8 @@ using namespace std;
 int main()
 {
     Mat f_image =imread("finger_print.png");
-    Mat a_image =imread("adaptive_1.jpg");
-    Mat a1_image =imread("adaptive.png");
+    Mat a_image =imread("adaptive.png");
+    Mat a1_image =imread("adaptive_1.jpg");
     Mat f_dst,a_dst,a1_dst;
 
     
@@ -27,16 +27,15 @@ int main()
     cvtColor(a1_image,a1_image,CV_BGR2GRAY);
 
     threshold(f_image,f_dst,160, 255, CV_THRESH_BINARY);
-    //inRange(a_image,Scalar(160),Scalar(225),a_dst);
+    adaptiveThreshold(a_image,a_dst, 255, CV_ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,3,5); 
+    adaptiveThreshold(a1_image,a1_dst, 255, CV_ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,85, 15); 
     
-    adaptiveThreshold(a_image,a_dst, 255, CV_ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,85, 15); //줄무늬 격자가 있는 이미지 => 가우시안블러처리
     
-    adaptiveThreshold(a1_image,a1_dst, 255, ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,3,5); //
     
 
-    imshow("finger_print.png",f_dst);
-    imshow("adaptive.png",a_dst);
-    imshow("adpative1.png",a1_dst);
+    imshow("finger_print",f_dst);
+    imshow("adaptive_1",a1_dst);
+    imshow("adpative",a_dst);
 
     waitKey(0);
     return 0;

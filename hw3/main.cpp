@@ -15,7 +15,7 @@ int main()
 
     imshow("moon", image_m);
     GaussianBlur(image_m, GaussianImg, Size(3, 3), 0, 0, BORDER_DEFAULT);
-    image_result1 = image_m-GaussianImg; //gmask
+    image_result1 = image_m-GaussianImg; //gmask = 일반 이미지 - 가우시안 블러 처한 이지
     add(image_m(rect_1),image_result1(rect_1)*6,image_result2(rect_1));
 
    imshow("moon_filtered", image_result2);

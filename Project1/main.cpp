@@ -37,7 +37,7 @@ int main()
     int delay, temp;
     int input = 114;
     VideoCapture cap; // 카메라 또는 비디오 파일로 부터 프레임을 읽는데 필요한 정보
-    float gamma = 2.5;
+    float gamma = 0.5;
     unsigned char pix[256];
 
     if (cap.open("Road.mp4") == 0)
@@ -87,6 +87,7 @@ int main()
 
         else if (input == 103) // gamma
         {
+
             Mat temp;
             cvtColor(frame, temp, CV_BGR2HSV);
             vector<Mat> channels;
@@ -100,7 +101,6 @@ int main()
             for (int j = 0; j < frame.cols; j++)
                 for (int i = 0; i < frame.rows; i++)
                 {
-                    // negative_img.at<uchar>(j, i) = pix[negative_img.at<uchar>(j, i)];
                     channels[2].ptr<uchar>(i, j)[0] = pix[channels[2].ptr<uchar>(i, j)[0]];
                     channels[2].ptr<uchar>(i, j)[1] = pix[channels[2].ptr<uchar>(i, j)[1]];
                     channels[2].ptr<uchar>(i, j)[2] = pix[channels[2].ptr<uchar>(i, j)[2]];
@@ -125,30 +125,56 @@ int main()
         }
         else if (input == 115)
         { // slice
-             Mat temp;
-            cvtColor(frame, temp, CV_BGR2HSV);
-            vector<Mat> channels;
-            split(temp, channels);
 
-            for(int j=0; j<frame.cols; j++){
-                for(int i=0; i<frame.rows; i++){
-                    if(channels[2].ptr<uchar>(i, j)[0]>9 && channels[2].ptr<uchar>(i, j)[0]<11){
-                        channels[2].ptr<uchar>(i, j)[0] = channels[2].ptr<uchar>(i, j)[0];
-                    }
-                    else {
-                        channels[2].ptr<uchar>(i, j)[0] = 0;
-                    }
+            uchar *h;
+            uchar *s;
+            uchar *v;
+            vector<Mat> mo(3);
+            Mat HSV;
+            cvtColor(frame, HSV, CV_BGR2HSV);
+            split(HSV, mo);
+
+            for (int j = 0; j < frame.rows; j++)
+            {
+                h = mo[0].ptr<uchar>(j);
+                s = mo[1].ptr<uchar>(j);
+                for (int i = 0; i < frame.cols; i++)
+                {
+                    if (h[i] > 9 && h[i] < 23)
+                        s[i] = s[i];
+                    else
+                        s[i] = 0;
                 }
             }
-            merge(channels, temp);
-            
-            cvtColor(temp, temp, CV_HSV2BGR);
-            frame = temp;
+            merge(mo, frame);
+            cvtColor(frame, frame, CV_HSV2BGR);
             imshow("video", frame);
         }
         else if (input == 99)
         { // c
-        imshow("video", frame);
+            uchar *h;
+            uchar *s;
+            uchar *v;
+            vector<Mat> cc(3);
+            Mat HSV;
+            cvtColor(frame, HSV, CV_BGR2HSV);
+            split(HSV, cc);
+
+            for (int j = 0; j < frame.rows; j++)
+            {
+                h = cc[0].ptr<uchar>(j);
+                // s = cc[1].ptr<uchar>(j);
+                for (int i = 0; i < frame.cols; i++)
+                {
+                    if (h[i] > 129)
+                        h[i] = h[i] - 129;
+                    else
+                        h[i] += 50;
+                }
+            }
+            merge(cc, frame);
+            cvtColor(frame, frame, CV_HSV2BGR);
+            imshow("video", frame);
         }
         else if (input == 97)
         { // a verage
