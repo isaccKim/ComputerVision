@@ -214,7 +214,7 @@ int main()
             merge(bgr_channels, 3, frame);
             imshow("video", frame);
         }
-        else if (input == 114)
+        else if (input == 114) // r
         {
             imshow("video", frame);
         }
