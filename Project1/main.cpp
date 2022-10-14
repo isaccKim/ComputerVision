@@ -37,7 +37,7 @@ int main()
     int delay, temp;
     int input = 114;
     VideoCapture cap; // 카메라 또는 비디오 파일로 부터 프레임을 읽는데 필요한 정보
-    float gamma = 0.5;
+    float gamma = 2.5;
     unsigned char pix[256];
 
     if (cap.open("Road.mp4") == 0)
@@ -57,30 +57,28 @@ int main()
 
         if (temp != -1)
         {
+            if(temp ==27)break;
             if (temp == 110 || temp == 103 || temp == 104 || temp == 115 || temp == 99 || temp == 97 || temp == 119 || temp == 114)
             {
                 input = temp;
             }
         }
-
         if (input == 110) // n : negative
         {
-            Mat temp;
-            cvtColor(frame, temp, CV_BGR2HSV);
+            Mat temp_1;
+            cvtColor(frame, temp_1, CV_BGR2HSV);
             vector<Mat> channels;
-            split(temp, channels);
+            split(temp_1, channels);
 
             for (int j = 0; j < frame.cols; j++)
                 for (int i = 0; i < frame.rows; i++)
                 {
-                    channels[2].ptr<uchar>(i, j)[0] = 255 - channels[2].ptr<uchar>(i, j)[0];
-                    channels[2].ptr<uchar>(i, j)[1] = 255 - channels[2].ptr<uchar>(i, j)[1];
-                    channels[2].ptr<uchar>(i, j)[2] = 255 - channels[2].ptr<uchar>(i, j)[2];
+                    channels[2].at<uchar>(i, j) = 255 - channels[2].at<uchar>(i, j);
                 }
 
-            merge(channels, temp);
-            cvtColor(temp, temp, CV_HSV2BGR);
-            frame = temp;
+            merge(channels, temp_1);
+            cvtColor(temp_1, temp_1, CV_HSV2BGR);
+            frame = temp_1;
 
             imshow("video", frame);
         }
@@ -88,10 +86,10 @@ int main()
         else if (input == 103) // gamma
         {
 
-            Mat temp;
-            cvtColor(frame, temp, CV_BGR2HSV);
+            Mat temp_1;
+            cvtColor(frame, temp_1, CV_BGR2HSV);
             vector<Mat> channels;
-            split(temp, channels);
+            split(temp_1, channels);
 
             for (int i = 0; i < 256; i++)
             {
@@ -101,14 +99,12 @@ int main()
             for (int j = 0; j < frame.cols; j++)
                 for (int i = 0; i < frame.rows; i++)
                 {
-                    channels[2].ptr<uchar>(i, j)[0] = pix[channels[2].ptr<uchar>(i, j)[0]];
-                    channels[2].ptr<uchar>(i, j)[1] = pix[channels[2].ptr<uchar>(i, j)[1]];
-                    channels[2].ptr<uchar>(i, j)[2] = pix[channels[2].ptr<uchar>(i, j)[2]];
+                    channels[2].at<uchar>(i, j) = pix[channels[2].at<uchar>(i, j)];
                 }
 
-            merge(channels, temp);
-            cvtColor(temp, temp, CV_HSV2BGR);
-            frame = temp;
+            merge(channels, temp_1);
+            cvtColor(temp_1, temp_1, CV_HSV2BGR);
+            frame = temp_1;
             imshow("video", frame);
         }
         else if (input == 104)
