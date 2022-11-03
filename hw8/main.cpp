@@ -32,7 +32,7 @@ int main()
     int i, fps, delay;
     int temp;
     int type, detect_on;
-    int flag = 0, flag_2 = 0;
+    int flag = 0, flag_2 = 0, flag_3 = 0;
     // openthe webcam
     VideoCapture cap;
 
@@ -59,6 +59,12 @@ int main()
         {
             type = temp;
             flag = 1;
+            flag_2 = 0;
+        }
+
+        if(detect_on != 0 && temp == 116){
+            destroyWindow("tracking");
+            detect_on = 0;
             flag_2 = 0;
         }
         if (temp == 116 && flag == 1){
@@ -105,9 +111,6 @@ int main()
             cap >> frame;
             flag = 0;
             type = 0;
-            destroyWindow("tracking");
-            detect_on = 0;
-
         } // r: reset
 
         for (i = 0; i < faces.size(); i++)
@@ -119,7 +122,7 @@ int main()
                 compare(result, GC_PR_FGD, result, CMP_EQ);
                 foreground = Mat(frame.size(), CV_8UC3, Scalar(255, 0, 0));
                 frame.copyTo(foreground, result);
-                imshow("trakcing", foreground);
+                imshow("tracking", foreground);
             }
             if (type == 102 || type == 109 || type == 110)
             {
