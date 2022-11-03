@@ -31,7 +31,7 @@ int main()
     vector<Rect> faces;
     int i, fps, delay;
     int temp;
-    int type, detect_on;
+    int type, detect_on=0;
     int flag = 0, flag_2 = 0, flag_3 = 0;
     // openthe webcam
     VideoCapture cap;
@@ -51,25 +51,30 @@ int main()
 
     while (true)
     {
+
         cap >> frame;
 
         temp = waitKey(delay);
 
-        if (temp == 102 || temp == 109 || temp == 110 || temp == 114)
+        if (temp == 102 || temp == 109 || temp == 110)
         {
             type = temp;
             flag = 1;
             flag_2 = 0;
         }
-
-        if(detect_on != 0 && temp == 116){
-            destroyWindow("tracking");
-            detect_on = 0;
+        if(temp == 114  && detect_on == 0){
+            type = 114;
             flag_2 = 0;
+        }
+
+        if(detect_on == 116 && temp == 116){
+            detect_on = 0;
+            destroyWindow("tracking");
+            type = 0;
+            flag = 0;
         }
         if (temp == 116 && flag == 1){
             detect_on = temp;
-            flag_2 = 0;
         }
         else if (temp == 116 && flag ==0 )
             {
@@ -79,14 +84,15 @@ int main()
         if(flag_2 == 1){
             putText(frame, "Detect before tracking", Point(20, 60), FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 1);
         }            
-
+        cout << "___________"<<  endl;
         cout << "type: "<< type << endl;
         cout << "flag: "<< flag << endl;
         cout << "temp: "<< temp << endl;
-
+        cout << "flag_2: "<< flag_2 << endl;
+        cout << "detect_on: " << detect_on << endl;
         cvtColor(frame, grayframe, COLOR_BGR2GRAY);
 
-        // face_classifier.detectMultiScale(grayframe, faces, 1.1, 3, 0, Size(30, 30));
+        // face_classifier.detectMultiScale(grayframe, fa2ces, 1.1, 3, 0, Size(30, 30));
         // draw the results
 
         // print the output
@@ -110,12 +116,13 @@ int main()
         {
             cap >> frame;
             flag = 0;
+            flag_2 = 0;
             type = 0;
         } // r: reset
 
         for (i = 0; i < faces.size(); i++)
         {
-            if (detect_on == 116)
+            if (detect_on == 116 && flag == 1)
             { 
                 Rect rectangle(faces[i].x, faces[i].y, faces[i].width, faces[i].height);
                 grabCut(frame, result, rectangle, bgdModel, fgdModel, 4, GC_INIT_WITH_RECT);
@@ -137,8 +144,12 @@ int main()
 
         // ESC
 
-
         imshow("Faces", frame);
+
+        if(type == 102){
+            destroyWindow("Faces");
+        }
+        
 
         waitKey(delay);
     }
