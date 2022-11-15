@@ -31,7 +31,7 @@ int main()
     vector<Rect> faces;
     int i, fps, delay;
     int temp;
-    int type, detect_on=0;
+    int type, detect_on = 0;
     int flag = 0, flag_2 = 0, flag_3 = 0;
     // openthe webcam
     VideoCapture cap;
@@ -51,7 +51,6 @@ int main()
 
     while (true)
     {
-
         cap >> frame;
 
         temp = waitKey(delay);
@@ -62,34 +61,189 @@ int main()
             flag = 1;
             flag_2 = 0;
         }
-        if(temp == 114  && detect_on == 0){
+        if (temp == 114)
+        {
             type = 114;
             flag_2 = 0;
         }
 
-        if(detect_on == 116 && temp == 116){
+        if (detect_on == 116 && temp == 116)
+        {
             detect_on = 0;
             destroyWindow("tracking");
             type = 0;
             flag = 0;
+            temp = -1;
         }
-        if (temp == 116 && flag == 1){
+        
+        if (temp == 116 && flag == 1)
+        {
             detect_on = temp;
         }
-        else if (temp == 116 && flag ==0 )
-            {
-                flag_2 = 1;
-            }
 
-        if(flag_2 == 1){
+        if (flag_2 == 1)
+        {
             putText(frame, "Detect before tracking", Point(20, 60), FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 1);
-        }            
-        cout << "___________"<<  endl;
-        cout << "type: "<< type << endl;
-        cout << "flag: "<< flag << endl;
-        cout << "temp: "<< temp << endl;
-        cout << "flag_2: "<< flag_2 << endl;
-        cout << "detect_on: " << detect_on << endl;
+        }
+        else if (temp == 116 && flag == 0)
+        {
+            flag_2 = 1 while
+(1)
+{
+Mat
+frame
+;
+cap
+>> 
+frame
+; // 
+get
+a
+new
+frame
+from
+camera
+/
+video
+or
+read
+image
+if
+(
+frame.empty
+()) {
+waitKey
+();
+break
+;
+}
+if
+(
+frame.channels
+() == 4) 
+cvtColor
+(
+frame
+, 
+frame
+, COLOR_BGRA2BGR);
+// 
+Convert
+Mat
+to
+batch
+of 
+images
+Mat
+inputBlob
+= 
+blobFromImage
+(
+frame
+, 1 / 255.F, 
+Size
+(416, 416), 
+Scalar
+(), 
+true
+, 
+false
+);
+net.setInput
+(
+inputBlob
+, "
+data
+");                   //
+set
+the
+network
+input
+Mat
+detectionMat
+= 
+net.forward
+("
+detection_out
+");   //
+compute
+output
+float
+confidenceThreshold
+= 0.24; //
+by
+default
+for
+(
+int
+i
+= 0; 
+i
+< 
+detectionMat.rows
+; 
+i
+++)
+{
+const
+int
+probability_index
+= 5;
+const
+int
+probability_size
+= 
+detectionMat.cols
+-
+probability_index
+;
+float
+*
+prob_array_ptr
+= &
+detectionMat.at
+<
+float
+>(
+i
+, 
+probability_index
+);
+size_t
+objectClass
+= 
+max_element
+(
+prob_array_ptr
+, 
+prob_array_ptr
++ 
+probability_size
+) 
+-
+prob_array_ptr
+;
+//
+prediction probability of each class
+float
+confidence
+= 
+detectionMat.at
+<
+float
+>(
+i
+, (
+int
+)
+objectClass
++ 
+probability_index
+);
+
+;
+        }
+
         cvtColor(frame, grayframe, COLOR_BGR2GRAY);
 
         // face_classifier.detectMultiScale(grayframe, fa2ces, 1.1, 3, 0, Size(30, 30));
@@ -109,7 +263,7 @@ int main()
 
         else if (type == 110)
         {
-            face_classifier.detectMultiScale(grayframe, faces, 1.1, 3, 0, Size(75, 75), Size(80, 80));
+            face_classifier.detectMultiScale(grayframe, faces, 1.1, 3, 0, Size(76, 76), Size(85, 85));
         } // n : nearest
 
         else if (type == 114)
@@ -118,12 +272,14 @@ int main()
             flag = 0;
             flag_2 = 0;
             type = 0;
+            detect_on = 0;
+            destroyWindow("tracking");
         } // r: reset
 
         for (i = 0; i < faces.size(); i++)
         {
             if (detect_on == 116 && flag == 1)
-            { 
+            {
                 Rect rectangle(faces[i].x, faces[i].y, faces[i].width, faces[i].height);
                 grabCut(frame, result, rectangle, bgdModel, fgdModel, 4, GC_INIT_WITH_RECT);
                 compare(result, GC_PR_FGD, result, CMP_EQ);
@@ -133,23 +289,32 @@ int main()
             }
             if (type == 102 || type == 109 || type == 110)
             {
+                char key;
                 Point lb(faces[i].x + faces[i].width, faces[i].y + faces[i].height);
                 Point tr(faces[i].x, faces[i].y);
+                if(type == 102){
+                    putText(frame,"f", Point(faces[i].x+20, faces[i].y+20), FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255,0), 1);
+                }
+                if(type == 109){
+                    putText(frame,"m", Point(faces[i].x+20, faces[i].y+20), FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255,0), 1);
+                }
+                if(type == 110){
+                    putText(frame,"n", Point(faces[i].x+20, faces[i].y+20), FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255,0), 1);
+                }
+                
                 rectangle(frame, lb, tr, Scalar(0, 255, 0), 3, 4, 0);
             }
         }
-
+        // ESC
         if (type == 27)
             break;
 
-        // ESC
-
-        imshow("Faces", frame);
-
-        if(type == 102){
-            destroyWindow("Faces");
+        if(!frame.empty()){
+            imshow("Faces", frame);
         }
-        
+        else {
+            break;
+        }
 
         waitKey(delay);
     }
