@@ -17,14 +17,9 @@ static void onMouse(int event, int x, int y, int, void *param)
     if (event == EVENT_LBUTTONDOWN) // left button
     {
         mp->out.push_back(Point2f(x, y));
+        cout << x << " " << y << endl;
+
     } // Resetpositions
-
-     if (event == EVENT_RBUTTONDOWN)
-    {
-        mp->out.clear();
-    }
-
-    
 }
 int main()
 {
@@ -62,9 +57,6 @@ int main()
         cap_2 >> frame2; // input
         imput = frame2;
         mp.img = imput;
-
-     
-
         if (flag_2 == 0)
         {
             mp.in.push_back(Point2f(0, 0));
@@ -72,6 +64,11 @@ int main()
             mp.in.push_back(Point2f(frame2.cols - 1, frame2.rows - 1));
             mp.in.push_back(Point2f(0, frame2.rows - 1));
             flag_2 = 1;
+
+            for (size_t i = 0; i < mp.in.size(); i++)
+            {
+                cout << mp.in[i] << endl;
+            }
         }
         if(mp.out.size()<4){
             for (size_t i = 0; i < mp.out.size(); i++)
@@ -97,22 +94,13 @@ int main()
           int npt[] = { 4 };
           fillPoly(frame1, ppt, npt, 1, Scalar(0, 0, 0), 8);
 
+
             frame1 += result;
         }
 
-      if(!frame1.empty()){
-            imshow("background", frame1);
-        }
-        else {
-            break;
-        }
-            if(!frame2.empty()){
-            imshow("input", frame2); // input
-        }
-        else {
-            break;
-        }
-    
+        imshow("background", frame1);
+        imshow("input", frame2); // input
+
         setMouseCallback("background", onMouse, (void *)&mp);
 
         waitKey(delay);
