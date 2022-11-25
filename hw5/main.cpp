@@ -25,6 +25,9 @@ Mat drawLines(Mat left_src, Mat right_src, Mat result)
     y0 = b * rho;
     p1 = Point(cvRound(x0 + 1000 * (-b)) + 200, cvRound(y0 + 1000 * a) + 400);
     p2 = Point(cvRound(x0 - 1000 * (-b)) + 200, cvRound(y0 - 1000 * a) + 400);
+
+    cout << p1 << endl;
+    cout << p2 << endl;
     // ROI를 하며 바뀐 중심측
     if(p1 != Point(200,400) && p2 != Point(200,400)){
         line(result, p1, p2, Scalar(0, 0, 255), 4, 0); // x,y,좌표가 없을 경우 200,400좌표에 점이 생기는 것을 막기위한 if문
@@ -85,7 +88,9 @@ int main()
         canny_left = canny(Range(400, 600), Range(200, 600));
         canny_right = canny(Range(400, 600), Range(600, 1000));
         frame = drawLines(canny_left, canny_right, frame);
-
+        cout << frame.cols << endl;
+        cout << frame.rows << endl;
+        putText(frame, "tt!", Point(600,1000), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 255, 0));
         imshow("video", frame);
         moveWindow("Left Canny", 200, 0);
         imshow("Left Canny", canny_left);

@@ -1,77 +1,113 @@
 #include "cv.hpp"
 #include <iostream>
-#include <opencv2/dnn.hpp>
-#include <fstream>
+
 using namespace cv;
 using namespace std;
-using namespace dnn;
-int main(
-    int argc,
-    char **argv)
+
+int drawLines(Mat left_src, Mat right_src, Mat result)
 {
-    String modelConfiguration = "deep /yolov2 -tiny.cfg";
-    String modelBinary = "deep /yolov2 -tiny.weights";
-    Netnet = readNetFromDarknet(modelConfiguration, modelBinary);
-    VideoCapture cap("deep/downtown_road.mp4");
-    vector<String> classNamesVec;
-    ifstream classNamesFile("deep/coco.names");
-    if (classNamesFile.is_open())
+    vector<Vec2f> lines;
+    float rho = 0, theta = 0, a, b, x0, y0;
+    Point p1, p2; 
+
+    HoughLines(left_src, lines, 1, CV_PI / 180, 50, 0, 0,  CV_PI / 180 * 70, CV_PI / 180 * 80); 
+    // HoughLines : 일반 평면에 있던 점들을 다른 좌표평면에 직선으로 나타내고 그값을 lines애 저장
+    for (int i = 0; i < lines.size(); i++)
     {
-        string className = "";
-        while (std ::getline(
-            classNamesFile,
-            className))
-            classNamesVec.push_back(
-                className);
+        rho += lines[i][0];
+        theta += lines[i][1];
     }
+    rho /= lines.size();  
+    theta /= lines.size();
+
+    a = cos(theta);
+    b = sin(theta);
+    x0 = a * rho; // 평면 옮기는 작업
+    y0 = b * rho;
+    p1 = Point(cvRound(x0 + 1000 * (-b)) + 290, cvRound(y0 + 1000 * a) + 330);
+    p2 = Point(cvRound(x0 - 1000 * (-b)) + 290, cvRound(y0 - 1000 * a) + 330);
+
+    cout << p1 << endl;
+    cout << p2 << endl;
+    // ROI를 하며 바뀐 중심측
+    if(p1 != Point(290,330) && p2 != Point(290,330)){
+        line(result, p1, p2, Scalar(0, 0, 255), 4, 0); // x,y,좌표가 없을 경우 350,400좌표에 점이 생기는 것을 막기위한 if문
+        return 1;
+    } 
+
+    HoughLines(right_src, lines, 1, CV_PI / 180, 62, 0, 0,  CV_PI / 180, CV_PI / 180*180 );
+    cout <<  CV_PI / 180<< endl;
+    cout <<  CV_PI / 180<< endl;
+    
+    rho = 0;
+    theta = 0;
+    for (int i = 0; i < lines.size(); i++)
+    {
+        rho += lines[i][0];
+        theta += lines[i][1];
+    }
+    rho /= lines.size(); 
+    theta /= lines.size();
+
+    a = cos(theta);
+    b = sin(theta);
+    x0 = a * rho;
+    y0 = b * rho;
+    p1 = Point(cvRound(x0 + 1000 * (-b)) + 350, cvRound(y0 + 1000 * a) + 330);
+    p2 = Point(cvRound(x0 - 1000 * (-b)) + 350, cvRound(y0 - 1000 * a) + 330);
+    if(p1 != Point(350,330) && p2 != Point(350,330)){
+        line(result, p1, p2, Scalar(0, 0, 255), 4, 0);
+        return 1;
+    }
+    return 0;
+}
+
+int main()
+{
+    Mat frame, canny_left, canny_right, gray, blurIm, canny;
+    int fps;
+    int delay;
+
+
+    VideoCapture cap; // 카메라 또는 비디오 파일로 부터 프레임을 읽는데 필요한 정보
+    
+
+
+    if (cap.open("deep/Project3_1.mp4") == 0)
+    {
+        cout << "no such file!" << endl;
+        waitKey(0);
+    }
+    fps = cap.get(CAP_PROP_FPS); // 초당 프레임 수
+
+    delay = 1000 / fps;
     while (1)
     {
-        Mat frame;
-        cap >> frame; // get a new frame from camera /video or read image
-        if (frame.empty())
-        {
-            waitKey();
-            break;
+        cap >> frame;
+     
+        cvtColor(frame, gray, CV_BGR2GRAY);
+
+        blur(gray, blurIm, Size(5, 5)); 
+        Canny(blurIm, canny, 10, 60, 3);
+                //  x   y     x   y
+                // 290,341 / 350 480 
+                // 350,341 / 410 480
+                
+        canny_left = canny(Range(330, 480), Range(290, 350));
+        canny_right = canny(Range(330, 480), Range(350, 410)); 
+        if(drawLines(canny_left, canny_right, frame) == 1){
+            putText(frame, "Line Detection", Point(frame.cols/3,frame.rows/3), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 0));
         }
-        if (
-            frame.channels() == 4)
-            cvtColor(
-                frame,
-                frame, COLOR_BGRA2BGR);
-        // Convert Mat to batch of images
-        Mat inputBlob =
-            blobFromImage(frame, 1 / 255.F, Size(416, 416), Scalar(), true, false);
-        net.setInput(inputBlob, "data");                 // set the network input
-        Mat detectionMat = net.forward("detection_out"); // compute output
-        float confidenceThreshold = 0.24;                // by default
-        for (int i = 0; i < detectionMat.rows; i++)
-        {
-            const int
-                probability_index = 5;
-            const int
-                probability_size =
-                    detectionMat.cols -
-                    probability_index;
-            float
-                *
-                    prob_array_ptr = &detectionMat.at<
-                        float>(
-                        i,
-                        probability_index);
-            size_t
-                objectClass =
-                    max_element(
-                        prob_array_ptr,
-                        prob_array_ptr +
-                            probability_size) -
-                    prob_array_ptr;
-            //
-            prediction probability of each class
-                float
-                    confidence =
-                        detectionMat.at<
-                            float>(
-                            i, (
-                                   int)
-                                       objectClass +
-                                   probability_index);
+        cout << frame.cols << endl;
+        cout << frame.rows << endl;
+        rectangle(frame, Rect(Point(350,330),Point(410,480)), Scalar(0, 0, 255), 1, 8, 0);
+        rectangle(frame, Rect(Point(290,330),Point(350,480)), Scalar(0, 0, 255), 1, 8, 0);
+        imshow("video", frame);
+        moveWindow("Left Canny", 350, 0);
+        imshow("Left Canny", canny_left);
+        moveWindow("Right Canny", 480, 0);
+        imshow("Right Canny", canny_right);
+        // waitKey(delay);
+        waitKey(2);
+    }
+}
