@@ -10,7 +10,7 @@ int drawLines(Mat left_src, Mat right_src, Mat result)
     float rho = 0, theta = 0, a, b, x0, y0;
     Point p1, p2; 
 
-    HoughLines(left_src, lines, 1, CV_PI / 180, 50, 0, 0,  CV_PI / 180 * 70, CV_PI / 180 * 80); 
+    HoughLines(left_src, lines, 1, CV_PI / 180, 60, 0, 0,  CV_PI / 180*20, CV_PI / 180 * (180)); 
     // HoughLines : 일반 평면에 있던 점들을 다른 좌표평면에 직선으로 나타내고 그값을 lines애 저장
     for (int i = 0; i < lines.size(); i++)
     {
@@ -27,17 +27,15 @@ int drawLines(Mat left_src, Mat right_src, Mat result)
     p1 = Point(cvRound(x0 + 1000 * (-b)) + 290, cvRound(y0 + 1000 * a) + 330);
     p2 = Point(cvRound(x0 - 1000 * (-b)) + 290, cvRound(y0 - 1000 * a) + 330);
 
-    cout << p1 << endl;
-    cout << p2 << endl;
+
     // ROI를 하며 바뀐 중심측
     if(p1 != Point(290,330) && p2 != Point(290,330)){
         line(result, p1, p2, Scalar(0, 0, 255), 4, 0); // x,y,좌표가 없을 경우 350,400좌표에 점이 생기는 것을 막기위한 if문
         return 1;
     } 
 
-    HoughLines(right_src, lines, 1, CV_PI / 180, 62, 0, 0,  CV_PI / 180, CV_PI / 180*180 );
-    cout <<  CV_PI / 180<< endl;
-    cout <<  CV_PI / 180<< endl;
+    HoughLines(right_src, lines, 1, CV_PI / 180, 62, 0, 0,  CV_PI / 180*140, CV_PI / 180*180 );
+    
     
     rho = 0;
     theta = 0;
@@ -57,7 +55,7 @@ int drawLines(Mat left_src, Mat right_src, Mat result)
     p2 = Point(cvRound(x0 - 1000 * (-b)) + 350, cvRound(y0 - 1000 * a) + 330);
     if(p1 != Point(350,330) && p2 != Point(350,330)){
         line(result, p1, p2, Scalar(0, 0, 255), 4, 0);
-        return 1;
+        return 2;
     }
     return 0;
 }
@@ -95,19 +93,29 @@ int main()
                 
         canny_left = canny(Range(330, 480), Range(290, 350));
         canny_right = canny(Range(330, 480), Range(350, 410)); 
-        if(drawLines(canny_left, canny_right, frame) == 1){
-            putText(frame, "Line Detection", Point(frame.cols/3,frame.rows/3), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 0));
+      
+        // if(drawLines(canny_left, canny_right, frame) == 2){
+        //     putText(frame, " Rihgt Line Detection", Point(frame.cols/3,frame.rows/3), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 0));
+
+        // }
+
+          if(drawLines(canny_left, canny_right, frame) != 0){
+            putText(frame, "Lane Departure", Point(frame.cols/3-20,frame.rows/3), FONT_HERSHEY_SIMPLEX, 1, Scalar(255,0,0),2);
         }
-        cout << frame.cols << endl;
-        cout << frame.rows << endl;
+        // cout << frame.cols << endl;
+        // cout << frame.rows << endl;
+        rectangle(frame, Rect(Point(240,330),Point(440,360)), Scalar(0, 0, 255), 1, 8, 0); // ROI
+
         rectangle(frame, Rect(Point(350,330),Point(410,480)), Scalar(0, 0, 255), 1, 8, 0);
         rectangle(frame, Rect(Point(290,330),Point(350,480)), Scalar(0, 0, 255), 1, 8, 0);
+        
         imshow("video", frame);
         moveWindow("Left Canny", 350, 0);
         imshow("Left Canny", canny_left);
         moveWindow("Right Canny", 480, 0);
         imshow("Right Canny", canny_right);
+        
         // waitKey(delay);
-        waitKey(2);
+        waitKey(1);
     }
 }

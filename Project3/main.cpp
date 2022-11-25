@@ -168,14 +168,9 @@ int main(int argc, char **argv)
                 // rectangle(frame, Rect(Point(350,410),Point(460,470)), Scalar(0, 0, 255), 1, 8, 0);
                 // rectangle(frame, Rect(Point(240,410),Point(350,470)), Scalar(0, 0, 255), 1, 8, 0);
 
-                // 350,340 460 480
-                // 240,340  350 480 
-                rectangle(frame, Rect(Point(350,340),Point(460,480)), Scalar(0, 0, 255), 1, 8, 0);
-                rectangle(frame, Rect(Point(240,340),Point(350,480)), Scalar(0, 0, 255), 1, 8, 0);
+        
                 
                 cout << frame.cols/2 << endl;
-
-
             }
         }
         imshow("YOLO: Detections", frame);
