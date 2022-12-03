@@ -8,17 +8,15 @@ Mat quantization_mat1 = (Mat_<double>(8, 8) << 16, 11, 10, 16, 24, 40, 51, 61, 1
 Mat quantization_mat2 = (Mat_<double>(8, 8) << 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 Mat quantization_mat3 = (Mat_<double>(8, 8) << 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100);
 
-int width = 512;
-int height = 512;
 
 Mat imageshow(Mat mat, Mat y)
 {
     Mat block;
     y.convertTo(y, CV_64FC1);
 
-    for (int j = 0; j < height; j += 8)
+    for (int j = 0; j < y.rows; j += 8)
     {
-        for (int i = 0; i < width; i += 8)
+        for (int i = 0; i < y.cols; i += 8)
         {
             Rect rect(i, j, 8, 8);
             block = y(rect);
@@ -34,9 +32,9 @@ Mat imageshow(Mat mat, Mat y)
         }
     }
 
-    for (int j = 0; j < 512; j += 8)
+    for (int j = 0; j < y.rows; j += 8)
     {
-        for (int i = 0; i < 512; i += 8)
+        for (int i = 0; i < y.cols; i += 8)
         {
             Rect rect(i, j, 8, 8);
             block = y(rect);
@@ -44,7 +42,7 @@ Mat imageshow(Mat mat, Mat y)
             {
                 for (int l = 0; l < 8; l++)
                 {
-                    block.at<double>(k, l) = mat.at<double>(k, l) * block.at<double>(k, l);
+                    block.at<double>(k, l) = mat.at<double>(k, l)*  block.at<double>(k, l);
                 }
             }
             dct(block, block, 1);
@@ -59,15 +57,15 @@ double calPSNR(Mat y, Mat temp)
 {
     double mse = 0.0;
 
-    for (int i = 0; i < width; i++)
+    for (int i = 0; i < y.rows; i++)
     {
-        for (int j = 0; j < height; j++)
+        for (int j = 0; j < y.cols; j++)
         {
             mse += (temp.at<uchar>(i, j) - y.at<uchar>(i, j)) * (temp.at<uchar>(i, j) - y.at<uchar>(i, j));
         }
     }
     double max = 255;
-    mse = mse / (width * height);
+    mse = mse / (y.rows * y.cols);
     double psnr = 20 * log10(max) - 10 * log10(mse);
 
     return psnr;
@@ -88,9 +86,9 @@ int main()
     cvtColor(image, image_Ycbcr, CV_BGR2YCrCb);
     split(image_Ycbcr, Ycbcr_channels);
 
-    for (int j = 0; j < 512; j++)
+    for (int j = 0; j < image.rows; j++)
     {
-        for (int i = 0; i < 512; i++)
+        for (int i = 0; i < image.cols; i++)
         {
             y.at<uchar>(j, i) = 0;
             y.at<uchar>(j, i) = Ycbcr_channels[0].at<uchar>(j, i);
