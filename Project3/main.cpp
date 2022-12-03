@@ -103,7 +103,7 @@ int main(int argc, char **argv)
     String modelConfiguration = "deep/yolov2-tiny.cfg";
     String modelBinary = "deep/yolov2-tiny.weights";
     Net net = readNetFromDarknet(modelConfiguration, modelBinary);
-    VideoCapture cap("deep/Project3_2.mp4");
+    VideoCapture cap("deep/Project3_1.mp4");
     vector<String> classNamesVec;
     ifstream classNamesFile("deep/coco.names");
     if (classNamesFile.is_open())

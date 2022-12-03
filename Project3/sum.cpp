@@ -44,7 +44,7 @@ int drawLines(Mat left_src, Mat right_src, Mat result)
     float rho = 0, theta = 0, a, b, x0, y0;
     Point p1, p2; 
 
-    HoughLines(left_src, lines, 1, CV_PI / 180, 50, 0, 0,  CV_PI / 180 * 70, CV_PI / 180 * 80); 
+    HoughLines(left_src, lines, 1, CV_PI / 180, 60, 0, 0,  CV_PI / 180*20, CV_PI / 180 * (180)); 
     // HoughLines : 일반 평면에 있던 점들을 다른 좌표평면에 직선으로 나타내고 그값을 lines애 저장
     for (int i = 0; i < lines.size(); i++)
     {
@@ -61,17 +61,15 @@ int drawLines(Mat left_src, Mat right_src, Mat result)
     p1 = Point(cvRound(x0 + 1000 * (-b)) + 290, cvRound(y0 + 1000 * a) + 330);
     p2 = Point(cvRound(x0 - 1000 * (-b)) + 290, cvRound(y0 - 1000 * a) + 330);
 
-    cout << p1 << endl;
-    cout << p2 << endl;
+
     // ROI를 하며 바뀐 중심측
     if(p1 != Point(290,330) && p2 != Point(290,330)){
-        line(result, p1, p2, Scalar(0, 0, 255), 4, 0); // x,y,좌표가 없을 경우 350,400좌표에 점이 생기는 것을 막기위한 if문
+        // line(result, p1, p2, Scalar(0, 0, 255), 4, 0); // x,y,좌표가 없을 경우 350,400좌표에 점이 생기는 것을 막기위한 if문
         return 1;
     } 
 
-    HoughLines(right_src, lines, 1, CV_PI / 180, 62, 0, 0,  CV_PI / 180, CV_PI / 180*180 );
-    cout <<  CV_PI / 180<< endl;
-    cout <<  CV_PI / 180<< endl;
+    HoughLines(right_src, lines, 1, CV_PI / 180, 62, 0, 0,  CV_PI / 180*140, CV_PI / 180*180 );
+    
     
     rho = 0;
     theta = 0;
@@ -90,20 +88,18 @@ int drawLines(Mat left_src, Mat right_src, Mat result)
     p1 = Point(cvRound(x0 + 1000 * (-b)) + 350, cvRound(y0 + 1000 * a) + 330);
     p2 = Point(cvRound(x0 - 1000 * (-b)) + 350, cvRound(y0 - 1000 * a) + 330);
     if(p1 != Point(350,330) && p2 != Point(350,330)){
-        line(result, p1, p2, Scalar(0, 0, 255), 4, 0);
-        return 1;
+        // line(result, p1, p2, Scalar(0, 0, 255), 4, 0);
+        return 2;
     }
     return 0;
 }
-
-
 int main(int argc, char **argv)
 {
     Mat frame, canny_left, canny_right, gray, blurIm, canny;
     String modelConfiguration = "deep/yolov2-tiny.cfg";
     String modelBinary = "deep/yolov2-tiny.weights";
     Net net = readNetFromDarknet(modelConfiguration, modelBinary);
-    VideoCapture cap("deep/Project3_2.mp4");
+    VideoCapture cap("deep/Project3_1.mp4");
     vector<String> classNamesVec;
     ifstream classNamesFile("deep/coco.names");
     if (classNamesFile.is_open())
@@ -157,12 +153,12 @@ int main(int argc, char **argv)
                 cout << frame.cols << endl;
                 if(className.c_str() == p && p2.x-p1.x>50){
                 // cout << (p2.x-p1.x) <<endl;
-                putText(frame, "Human detected nearby!", Point(frame.cols/3,frame.rows/3), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 255, 0));
+                putText(frame, "Human detected nearby!", Point(frame.cols/3-20,frame.rows/3), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 255, 0),2);
                 }
 
-                else if(className.c_str() == c && p2.x-p1.x>100){
+                else if(className.c_str() == c && p2.x-p1.x>150){
                 // cout << (p2.x-p1.x) <<endl;
-                putText(frame, "Car detected nearby!", Point(frame.cols/3,frame.rows/2), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 255, 0));
+                putText(frame, "Car detected nearby!", Point(frame.cols/3,frame.rows/2-10), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 255, 255),2);
                 }
                 
                 // rectangle(frame, Rect(Point(350,410),Point(460,470)), Scalar(0, 0, 255), 1, 8, 0);
@@ -173,6 +169,26 @@ int main(int argc, char **argv)
                 cout << frame.cols/2 << endl;
             }
         }
+           cvtColor(frame, gray, CV_BGR2GRAY);
+
+        blur(gray, blurIm, Size(5, 5)); 
+        Canny(blurIm, canny, 10, 60, 3);
+                //  x   y     x   y
+                // 290,341 / 350 480 
+                // 350,341 / 410 480
+                
+        canny_left = canny(Range(330, 480), Range(290, 350));
+        canny_right = canny(Range(330, 480), Range(350, 410)); 
+      
+        // if(drawLines(canny_left, canny_right, frame) == 2){
+        //     putText(frame, " Rihgt Line Detection", Point(frame.cols/3,frame.rows/3), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 0));
+
+        // }
+
+          if(drawLines(canny_left, canny_right, frame) != 0){
+            putText(frame, "Lane Departure", Point(frame.cols/3-20,frame.rows/3), FONT_HERSHEY_SIMPLEX, 1, Scalar(255,0,0),2);
+        }
+
         imshow("YOLO: Detections", frame);
         if (waitKey(1) >= 0)
             break;
