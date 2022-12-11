@@ -8,7 +8,7 @@ int main()
 {
     Ptr<BackgroundSubtractor> bg_model = createBackgroundSubtractorMOG2();
     Mat image, foregroundMask, backgroundImg, foregroundImg;
-    VideoCapture cap("Project2.mp4");
+    VideoCapture cap("Project2_1.mp4");
     int value;
     int count =0;
 
@@ -21,6 +21,7 @@ int main()
             foregroundMask.create(image.size(), image.type());
         bg_model->apply(image, foregroundMask);
         GaussianBlur(foregroundMask, foregroundMask, Size(11, 11), 3.5, 3.5);
+        // threshold(foregroundMask, foregroundMask, 180, 255, THRESH_BINARY);
         threshold(foregroundMask, foregroundMask, 180, 255, THRESH_BINARY);
         foregroundImg = Scalar::all(0); 
         image.copyTo(foregroundImg, foregroundMask);
@@ -37,6 +38,7 @@ int main()
         if (!image.empty())
         {
             imshow("Project2",image);
+            imshow("Project3",foregroundMask);
         }
         waitKey(33);
     }
